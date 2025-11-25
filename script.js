@@ -1,56 +1,30 @@
 // Your code here.
-const container = document.querySelector(".items");
-const cubes = document.querySelectorAll(".item");
+const slider = document.querySelector('.items');
+let isDown = false;
+let startX;
+let scrollLeft;
 
-let isDragging = false;
-let activeCube = null;
-let offsetX = 0;
-let offsetY = 0;
-
-cubes.forEach(cube => {
-  const rect = cube.getBoundingClientRect();
-  const parentRect = container.getBoundingClientRect();
-
-  cube.style.position = "absolute";
-  cube.style.left = rect.left - parentRect.left + "px";
-  cube.style.top = rect.top - parentRect.top + "px";
+slider.addEventListener('mousedown', (e) => {
+  isDown = true;
+  slider.classList.add('active');
+  startX = e.pageX - slider.offsetLeft;
+  scrollLeft = slider.scrollLeft;
 });
 
-cubes.forEach(cube => {
-  cube.addEventListener("mousedown", (e) => {
-    isDragging = true;
-    activeCube = cube;
-
-    const rect = cube.getBoundingClientRect();
-    offsetX = e.clientX - rect.left;
-    offsetY = e.clientY - rect.top;
-
-    container.classList.add("active");
-  });
+slider.addEventListener('mouseleave', () => {
+  isDown = false;
+  slider.classList.remove('active');
 });
 
-document.addEventListener("mousemove", (e) => {
-  if (!isDragging || !activeCube) return;
-
-  const parentRect = container.getBoundingClientRect();
-  let newX = e.clientX - parentRect.left - offsetX;
-  let newY = e.clientY - parentRect.top - offsetY;
-
-  const maxX = parentRect.width - activeCube.offsetWidth;
-  const maxY = parentRect.height - activeCube.offsetHeight;
-
-  if (newX < 0) newX = 0;
-  if (newY < 0) newY = 0;
-  if (newX > maxX) newX = maxX;
-  if (newY > maxY) newY = maxY;
-
-  activeCube.style.left = newX + "px";
-  activeCube.style.top = newY + "px";
+slider.addEventListener('mouseup', () => {
+  isDown = false;
+  slider.classList.remove('active');
 });
 
-document.addEventListener("mouseup", () => {
-  isDragging = false;
-  activeCube = null;
-  container.classList.remove("active");
+slider.addEventListener('mousemove', (e) => {
+  if (!isDown) return;
+  e.preventDefault();
+  const x = e.pageX - slider.offsetLeft;
+  const walk = (x - startX) * 2; // scroll speed control
+  slider.scrollLeft = scrollLeft - walk;
 });
-
